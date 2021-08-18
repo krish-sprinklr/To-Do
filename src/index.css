@@ -1,13 +1,13 @@
 body {
   margin: 0;
   background: rgb(255, 255, 255);
-  background: linear-gradient(
+  /* background: linear-gradient(
     180deg,
     rgba(255, 255, 255, 1) 0%,
     rgba(255, 253, 242, 1) 50%,
     rgba(224, 224, 224, 1) 100%
   );
-  height: 100vh;
+  height: 100vh; */
 }
 
 input[type="text"],
@@ -39,11 +39,9 @@ input[type="submit"]:hover {
 
 .input-form {
   margin: 1rem;
-  border: 1px solid rgb(194, 194, 194);
   border-radius: 5px;
   background-color: #ffffff;
   padding: 20px;
-  width: 50%;
 }
 
 .input-component {
@@ -80,11 +78,87 @@ input[type="submit"]:hover {
   display: flex;
 }
 
-.sticker {
+.modal {
+  display: block;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgb(0, 0, 0);
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-content {
+  background-color: #fefefe;
+  margin: 15% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 40%;
+}
+
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 22px;
+  border: none;
+  background-color: #fefefe;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.add-card {
+  color: rgb(104, 104, 104);
+  float: right;
+  font-size: 22px;
+  border: none;
+  border-radius: 50%;
+}
+
+.add-card:hover,
+.add-card:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+.card {
   background-color: rgba(255, 228, 145, 255);
   margin: 0.5rem;
   padding: 1rem;
   border-radius: 1rem;
+}
+
+.lds-dual-ring {
+  display: inline-block;
+  width: 80px;
+  height: 80px;
+}
+.lds-dual-ring:after {
+  content: " ";
+  display: block;
+  width: 64px;
+  height: 64px;
+  margin: 8px;
+  border-radius: 50%;
+  border: 6px solid rgba(255, 228, 145, 255);
+  border-color: rgba(255, 228, 145, 255) transparent rgba(255, 228, 145, 255)
+    transparent;
+  animation: lds-dual-ring 1.2s linear infinite;
+}
+@keyframes lds-dual-ring {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .text-center {
