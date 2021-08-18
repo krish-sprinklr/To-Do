@@ -37,4 +37,12 @@ const data = [
   ],
 ];
 
-export default data;
+const delayedResult = () => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(data);
+    }, 1200);
+  });
+};
+
+export default delayedResult;
