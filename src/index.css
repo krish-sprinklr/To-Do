@@ -154,6 +154,32 @@ textarea[type="text"] {
   box-shadow: 2px 3px 1px 0px #e7e7e7;
 }
 
+.lds-dual-ring {
+  display: inline-block;
+  width: 80px;
+  height: 80px;
+}
+.lds-dual-ring:after {
+  content: " ";
+  display: block;
+  width: 64px;
+  height: 64px;
+  margin: 8px;
+  border-radius: 50%;
+  border: 6px solid rgba(255, 228, 145, 255);
+  border-color: rgba(255, 228, 145, 255) transparent rgba(255, 228, 145, 255)
+    transparent;
+  animation: lds-dual-ring 1.2s linear infinite;
+}
+@keyframes lds-dual-ring {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
 .text-center {
   text-align: center;
 }
