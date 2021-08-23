@@ -35,21 +35,32 @@ export default function Panel(props) {
 
   const handleDragOver = useCallback((event) => event.preventDefault(), []);
 
+  const getBorderClass = () => {
+    const color =
+      type === types.TODO ? "red" : type === types.DONE ? "green" : "blue";
+    return color;
+  };
+
   return (
-    <div
-      className="panel"
+    <li
+      className={`panel border-top-${getBorderClass()}`}
       id={type}
       onDrop={handleDrop}
       onDragOver={handleDragOver}
     >
-      <h1 className="text-center">{type}</h1>
-      {state[type].map((cardData) => {
-        return <Card key={cardData.id} cardData={cardData} />;
-      })}
-
-      <button className="add-card" onClick={props.openModal}>
-        +
-      </button>
-    </div>
+      <div className="panel-heading">
+        <p className="display-inline">{type}</p>
+        <button className="add-card" onClick={props.openModal}>
+          +
+        </button>
+      </div>
+      <ul className="list">
+        {state[type].map((cardData) => {
+          return (
+            <Card key={cardData.id} cardData={cardData} dispatch={dispatch} />
+          );
+        })}
+      </ul>
+    </li>
   );
 }

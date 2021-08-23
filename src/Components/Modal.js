@@ -13,23 +13,23 @@ export default function Modal(props) {
   };
 
   const handleHeadingChange = useCallback((event) => {
-    setHeading(event.target.value.trim());
+    setHeading(event.target.value);
   }, []);
 
   const handleContentChange = useCallback((event) => {
-    setContent(event.target.value.trim());
+    setContent(event.target.value);
   }, []);
 
   return (
-    <div id="myModal" className="modal">
+    <div className="modal">
       <div className="modal-content">
-        <div>
-          <button className="close" onClick={props.onClose}>
-            &times;
-          </button>
-        </div>
+        <button className="close" onClick={props.onClose}>
+          &times;
+        </button>
         <form className="input-form" onSubmit={handleSubmit}>
-          <label htmlFor="heading">Heading: </label>
+          <label htmlFor="heading">
+            <b>Heading:</b>{" "}
+          </label>
           <input
             type="text"
             id="heading"
@@ -39,7 +39,9 @@ export default function Modal(props) {
             onChange={handleHeadingChange}
           />
           <br />
-          <label htmlFor="content">Content: </label>
+          <label htmlFor="content">
+            <b>Content: </b>
+          </label>
           <textarea
             type="text"
             id="content"

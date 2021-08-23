@@ -2,13 +2,15 @@ import React from "react";
 import { v4 as uuidv4 } from "uuid";
 import Panel from "./Components/Panel";
 import Modal from "./Components/Modal";
-import toDos from "./Utils/db";
+import { getDataFromStorage, setDataToStorage } from "./Utils/service";
 import {
   types,
   INTIALISE,
   UPDATE_TODO,
   UPDATE_ONGOING,
   UPDATE_DONE,
+  DELETE_CARD,
+  key,
 } from "./Utils/constants";
 
 // Create a unique ID (guid)
@@ -27,13 +29,15 @@ const initialState = {
   [types.DONE]: [],
 };
 
+const handleFilterAction = (arr, id) => {
+  return arr.filter((data) => String(data.id) !== String(id));
+};
+
 function reducer(state, action) {
   switch (action.type) {
     case INTIALISE:
       return {
-        [types.TODO]: action.payload[0],
-        [types.ONGOING]: action.payload[1],
-        [types.DONE]: action.payload[2],
+        ...action.payload,
       };
     case UPDATE_TODO:
       return {
@@ -50,8 +54,17 @@ function reducer(state, action) {
         ...state,
         [types.DONE]: action.payload,
       };
+    case DELETE_CARD:
+      return {
+        [types.TODO]: handleFilterAction(state[types.TODO], action.payload),
+        [types.ONGOING]: handleFilterAction(
+          state[types.ONGOING],
+          action.payload
+        ),
+        [types.DONE]: handleFilterAction(state[types.DONE], action.payload),
+      };
     default:
-      throw new Error();
+      return state;
   }
 }
 
@@ -91,21 +104,28 @@ function App() {
   const [loading, setLoading] = React.useState(false);
 
   React.useEffect(() => {
-    const getData = async () => {
-      setLoading(true);
-      const data = await toDos();
-      dispatch({
-        type: INTIALISE,
-        payload: data,
-      });
+    setLoading(true);
+    let data = getDataFromStorage(key);
+    if (data === null) {
+      setDataToStorage(key, JSON.stringify(initialState));
       setLoading(false);
-    };
-    getData();
+      return;
+    }
+    data = JSON.parse(data);
+    dispatch({
+      type: INTIALISE,
+      payload: data,
+    });
+    setLoading(false);
   }, []);
+
+  React.useEffect(() => {
+    setDataToStorage(key, JSON.stringify(state));
+  });
 
   const Loader = () => {
     return (
-      <div class="text-center">
+      <div className="text-center">
         <h1>Loading...</h1>
         <img
           src="https://emoji.gg/assets/emoji/7451_dance.gif"
@@ -119,12 +139,11 @@ function App() {
 
   return (
     <div className="App">
-      <h1 className="text-center">To-Do App</h1>
-      <hr />
+      <h3 className="p-1 header">To-Do App</h3>
       {loading ? (
         <Loader />
       ) : (
-        <div className="panel-container">
+        <ul className="panel-container list">
           {Object.keys(types).map((type) => {
             return (
               <PanelWithButton
@@ -135,7 +154,7 @@ function App() {
               />
             );
           })}
-        </div>
+        </ul>
       )}
     </div>
   );
