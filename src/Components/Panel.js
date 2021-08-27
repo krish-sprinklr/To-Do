@@ -1,49 +1,59 @@
 import React, { useCallback } from "react";
 import Card from "./Card";
-import { types } from "../Utils/constants";
+import { UPDATE_ALL } from "../Utils/constants";
+import { getBorderClass } from "../Utils/functions";
+import { setDataToStorage } from "../Utils/service";
+import { localStorageKey } from "../Utils/constants";
 
 export default function Panel(props) {
   const { state, dispatch, type } = props;
 
-  const handleDrop = (event) => {
-    let updatedData = null;
-    const id = event.dataTransfer.getData("id");
-    const checkAvailable = (data) => {
-      if (String(data.id) === String(id)) {
-        updatedData = data;
-      }
-      return String(data.id) !== String(id);
-    };
-
-    Object.keys(types).forEach((element) => {
-      types[element] !== type &&
-        dispatch({
-          type: `UPDATE_${types[element]}`,
-          payload: state[types[element]].filter(checkAvailable),
-        });
-    });
-
-    Object.keys(types).forEach((element) => {
-      if (types[element] === type && updatedData !== null) {
-        dispatch({
-          type: `UPDATE_${types[element]}`,
-          payload: [...state[types[element]], updatedData],
-        });
-      }
-    });
-  };
-
   const handleDragOver = useCallback((event) => event.preventDefault(), []);
 
-  const getBorderClass = () => {
-    const color =
-      type === types.TODO ? "red" : type === types.DONE ? "green" : "blue";
-    return color;
-  };
+  const handleDragStart = useCallback(
+    (event, id) => {
+      event.dataTransfer.setData("dragged", JSON.stringify({ id, type }));
+    },
+    [type]
+  );
+
+  const handleDrop = useCallback(
+    (event) => {
+      let id, dragType, newData;
+      try {
+        const tempData = JSON.parse(event.dataTransfer.getData("dragged"));
+        dragType = tempData.type;
+        id = tempData.id;
+        newData = JSON.parse(JSON.stringify(state));
+      } catch (error) {
+        console.log(error);
+        return;
+      }
+      if (type === dragType) {
+        return;
+      }
+      const updatedData = newData[dragType].find(
+        (element) => String(element.id) === String(id)
+      );
+      newData[dragType] = newData[dragType].filter(
+        (data) => String(data.id) !== String(id)
+      );
+      if (updatedData === undefined) {
+        return;
+      }
+      newData[type].push(updatedData);
+      setDataToStorage(localStorageKey, JSON.stringify(newData));
+      dispatch({
+        type: UPDATE_ALL,
+        payload: newData,
+      });
+    },
+    [dispatch, state, type]
+  );
 
   return (
     <li
-      className={`panel border-top-${getBorderClass()}`}
+      className={`panel border-top-${getBorderClass(type)}`}
       id={type}
       onDrop={handleDrop}
       onDragOver={handleDragOver}
@@ -57,7 +67,20 @@ export default function Panel(props) {
       <ul className="list">
         {state[type].map((cardData) => {
           return (
-            <Card key={cardData.id} cardData={cardData} dispatch={dispatch} />
+            <li
+              className="card"
+              key={cardData.id}
+              id={cardData.id}
+              draggable
+              onDragStart={(event) => handleDragStart(event, cardData.id)}
+            >
+              <Card
+                cardData={cardData}
+                type={type}
+                dispatch={dispatch}
+                state={state}
+              />
+            </li>
           );
         })}
       </ul>

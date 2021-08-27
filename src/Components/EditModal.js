@@ -2,12 +2,12 @@ import React, { useCallback } from "react";
 import { updateCardAction } from "../Reducer/Action";
 import { setDataToStorage } from "../Utils/service";
 import { localStorageKey } from "../Utils/constants";
-import { v4 as uuidv4 } from "uuid";
 
 export default function Modal(props) {
-  const { state, dispatch, type, onClose, openSnackBar } = props;
-  const [heading, setHeading] = React.useState("");
-  const [content, setContent] = React.useState("");
+  const { state, dispatch, type, id, onClose } = props;
+
+  const [heading, setHeading] = React.useState(props.heading || "");
+  const [content, setContent] = React.useState(props.content || "");
   const [loading, setLoading] = React.useState(false);
 
   const handleSubmit = useCallback(
@@ -15,11 +15,6 @@ export default function Modal(props) {
       event.preventDefault();
       if (heading.length === 0) return;
       setLoading(true);
-      const newData = {
-        heading,
-        content,
-        id: uuidv4(),
-      };
       let data;
       try {
         data = JSON.parse(JSON.stringify(state));
@@ -27,16 +22,20 @@ export default function Modal(props) {
         // console.log(error);
         return;
       }
-      data[type].push(newData);
+      data[type].forEach((element, index) => {
+        if (element.id === id) {
+          data[type][index].heading = heading;
+          data[type][index].content = content;
+        }
+      });
       setDataToStorage(localStorageKey, JSON.stringify(data));
-      openSnackBar();
-      dispatch(updateCardAction([...state[type], newData], type));
+      dispatch(updateCardAction(data[type], type));
       setHeading("");
       setContent("");
       setLoading(false);
       onClose();
     },
-    [content, dispatch, heading, onClose, openSnackBar, state, type]
+    [content, dispatch, heading, id, onClose, state, type]
   );
 
   const handleHeadingChange = useCallback((event) => {
